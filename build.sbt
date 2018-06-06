@@ -5,11 +5,12 @@ lazy val root = (project in file(".")).
       organization := "com.noelwelsh",
       scalaVersion := "2.12.6"
     )),
-    name := "Functional Deep Learning",
+    name := "Functional Differentiable Programming",
     addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.7"),
     libraryDependencies ++= Seq(
       Dependencies.catsCore,
       Dependencies.catsEffect,
+      Dependencies.catsScalaCheck,
       Dependencies.miniTest,
       Dependencies.miniTestLaws,
       Dependencies.scalaCheck
