@@ -9,16 +9,16 @@ final case class Reverse[A](value: A, cont: Double => Double) {
   def flatMap[B](f: A => Reverse[B]): Reverse[B] = {
     val self = this
     val next = f(value)
-    Reverse(next.value, (d: Double) => d * next.cont(1) * self.cont(d))
+    Reverse(next.value, (d: Double) => self.cont(next.cont(1) * d))
   }
 
   // Binary operations
 
   def *(that: Reverse[Double])(implicit ev: A =:= Double): Reverse[Double] =
-    Reverse(this.value * that.value, (d: Double) => (this.cont(d) * that.value) + (that.cont(d) * this.value))
+    Reverse(this.value * that.value, (d: Double) => (this.cont(d * that.value)) + (that.cont(d * this.value)))
 
   def /(that: Reverse[Double])(implicit ev: A =:= Double): Reverse[Double] =
-    Reverse(this.value / that.value, (d: Double) => ((this.cont(d) * that.value) - (that.cont(d) * this.value)) / (that.value * that.value))
+    Reverse(this.value / that.value, (d: Double) => ((this.cont(d * that.value)) - (that.cont(d * this.value))) / (that.value * that.value))
 
   def +(that: Reverse[Double])(implicit ev: A =:= Double): Reverse[Double] =
     Reverse(this.value + that.value, (d: Double) => this.cont(d) + that.cont(d))
@@ -27,7 +27,7 @@ final case class Reverse[A](value: A, cont: Double => Double) {
     Reverse(this.value - that.value, (d: Double) => this.cont(d) - that.cont(d))
 
   def pow(r: Double)(implicit ev: A =:= Double): Reverse[Double] =
-    this.flatMap(x => Reverse(Math.pow(x, r), (_) => r * Math.pow(this.value, r - 1)))
+    this.flatMap(x => Reverse(Math.pow(x, r), (_) => r * Math.pow(x, r - 1)))
 
   // Unary operations
 

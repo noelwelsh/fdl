@@ -49,7 +49,7 @@ final case class Dual[A](value: A, derivative: Double) {
 
   def /(that: Dual[A])(implicit ev: A =:= Double): Dual[Double] = {
     val nextV = this.value / that.value
-    val nextD = ((this.derivative * that.value) - (this.derivative * that.value)) / (that.value * that.value)
+    val nextD = ((this.derivative * that.value) - (that.derivative * this.value)) / (that.value * that.value)
     Dual(nextV, nextD)
   }
 
@@ -66,9 +66,11 @@ final case class Dual[A](value: A, derivative: Double) {
   }
 
   def pow(r: Double)(implicit ev: A =:= Double): Dual[Double] = {
-    val nextV = Math.pow(this.value, r)
-    val nextD = r * Math.pow(this.value, r-1)
-    Dual(nextV, nextD)
+    this.flatMap{ value =>
+      val nextV = Math.pow(value, r)
+      val nextD = r * Math.pow(value, r-1)
+      Dual(nextV, nextD)
+    }
   }
 
   // Binary constant operations
